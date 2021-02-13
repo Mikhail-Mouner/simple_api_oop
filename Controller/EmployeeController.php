@@ -8,31 +8,61 @@ use \Config\Request;
 class EmployeeController extends Employee
 {
 
+    
+    public function __call($method,$arguments) {
+        if(method_exists($this, $method)) {
+            
+            switch ($method) {
+                case 'add':
+                    $request = 'POST';
+                break;
+                
+                case 'edit':
+                    $this->checkArgument($arguments);
+                    $request = 'PUT';
+                break;
+                
+                case 'delete':        
+                    $request = 'DELETE';
+                break;
+                
+                default:
+                    $request = 'GET';
+                    break;
+            }
+            $this->checkMethod($request);
+            return call_user_func_array(array($this,$method),$arguments);
+        }else{
+            encode(['error'=>true,'message'=>'This method doesnt exists!']);
+            die();
+        }
+    }
+
     private function request($method)
     {
-        $this->checkMethod($method);
         return $request = new Request($method);
     }
 
     private function checkMethod($method)
     {
         if ( $_SERVER['REQUEST_METHOD'] != $method ) {
-            encode(['error'=>true,'message'=>'Something was gone wronge']);
+            encode(['error'=>true,'message'=>'This request was wrong with this method']);
             die();
         }
     }
-
-    public function index()
+    
+    //------------Start Controller------------//
+    private function index()
     {
         return Employee::select()->getAll();
     }
 
-    public function show($id)
+    private function show($id)
     {
         return Employee::select()->where($id)->get();
     }
 
-    public function edit($id)
+    private function edit($id)
     {
         $request = $this->request('PUT');
 
@@ -45,7 +75,7 @@ class EmployeeController extends Employee
         return ['error'=>false,'message'=>'success'];
     }
     
-    public function add()
+    private function add()
     {
         $request = $this->request('POST');
 
@@ -58,14 +88,13 @@ class EmployeeController extends Employee
         return ['error'=>false,'message'=>'success','id'=>$emp_id];
     }
 
-    public function delete($id)
+    private function delete($id)
     {
-        $this->checkMethod('DELETE');
         Employee::where('id',$id)->remove();
         return ['error'=>false,'message'=>'success'];
     }
     
-    public function org($id = NULL)
+    private function org($id = NULL)
     {
         if (!is_null($id))
             return Employee::organizations()->where('employee.id' , $id)->getAll();
