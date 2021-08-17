@@ -1,5 +1,5 @@
 # simple api oop
-## simple rest api by using php oop
+#### simple rest api by using php oop
 
 ## _Developing By ♥ Mikhail_
 
@@ -11,7 +11,7 @@
 git clone https://github.com/Mikhail-Mouner/simple_api_oop.git
 ```
 
-Examples
+##Examples
 
 | METHOD | URL | TO |
 | ------ | ------ | ------ |
